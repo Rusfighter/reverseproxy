@@ -1,29 +1,20 @@
 import * as http from 'http';
 import * as https from 'https';
-import * as httpProxy from 'http-proxy';
-import { cacheResponse, getFromCache } from './proxyCache';
+import { createProxyWithCache } from './proxyWithCache';
 
-const proxy = httpProxy.createProxy({
+const proxy = createProxyWithCache({
   agent: new http.Agent({ keepAlive: true })
 });
 
-proxy.on('proxyRes', cacheResponse);
+http.createServer(proxy.web).listen(8088);
 
-const handleRequest = async (req, resp) => {
-  const exists = await getFromCache(req, resp);
-
-  if (!exists) {
-    // set logic
-    proxy.web(req, resp, {
-      target: {
-        host: 'vocalisator.com',
-        hostname: '185.104.29.58',
-        protocol: 'http'
-      },
-      changeOrigin: true,
-      secure: false
+/* function streamToBuffer(stream): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const buffers: Buffer[] = [];
+    stream.on('error', reject);
+    stream.on('data', data => buffers.push(data));
+    stream.on('end', () => {
+      resolve(Buffer.concat(buffers));
     });
-  }
-};
-
-http.createServer(handleRequest).listen(8088);
+  });
+} */
