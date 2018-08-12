@@ -1,18 +1,10 @@
-import * as stream from 'stream';
-import * as http from 'http';
-
-export interface WebResource {
-  stream: stream.Readable;
-  headers: http.OutgoingHttpHeaders;
-}
+import { Readable } from 'stream';
 
 export interface WebCache {
-  get(namespace: string, key: string): Promise<WebResource | undefined>;
-  set(
-    namespace: string,
-    key: string,
-    response: http.ServerResponse,
-    resource: stream.Readable
-  ): Promise<void>;
+  has(namespace: string, key: string): Promise<boolean>;
+  getStream(namespace: string, key: string): Promise<Readable>;
+  getValue(namespace: string, key: string): Promise<string>;
+  setStream(namespace: string, key: string, stream: Readable): Promise<void>;
+  setValue(namespace: string, key: string, value: string): Promise<void>;
   reset(namespace: string): Promise<void>;
 }

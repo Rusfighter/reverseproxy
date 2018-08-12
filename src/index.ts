@@ -1,10 +1,17 @@
 import * as http from 'http';
 import * as https from 'https';
-import { createProxyWithCache } from './proxyWithCache';
+import * as Path from 'path';
+import { createCacheProxy } from './CacheProxy';
+import { createDiskCache } from './cache/disk';
 
-const proxy = createProxyWithCache({
-  agent: new http.Agent({ keepAlive: true })
-});
+const proxy = createCacheProxy(
+  createDiskCache({
+    cacheDir: Path.join(process.cwd(), 'tmp')
+  }),
+  {
+    agent: new http.Agent({ keepAlive: true })
+  }
+);
 
 http.createServer(proxy.web).listen(8088);
 
